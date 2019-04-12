@@ -16,6 +16,15 @@ public class UsersVO {
     private String faceImageBig;
 
     private String nickname;
+    private String qrcode;
+
+    public String getQrcode() {
+        return qrcode;
+    }
+
+    public void setQrcode(String qrcode) {
+        this.qrcode = qrcode;
+    }
 
     public String getId() {
         return id;
