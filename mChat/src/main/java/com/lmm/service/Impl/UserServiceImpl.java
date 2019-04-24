@@ -1,10 +1,12 @@
 package com.lmm.service.Impl;
 
+import com.lmm.enums.MsgActionEnum;
+import com.lmm.enums.MsgSignFlagEnum;
 import com.lmm.enums.SearchFriendsStatusEnum;
-import com.lmm.mapper.FriendsRequestMapper;
-import com.lmm.mapper.MyFriendsMapper;
-import com.lmm.mapper.UsersMapper;
-import com.lmm.mapper.UsersMapperCustom;
+import com.lmm.mapper.*;
+import com.lmm.netty.ChatMsg;
+import com.lmm.netty.UserChannelRel;
+import com.lmm.pojo.DataContent;
 import com.lmm.pojo.FriendsRequest;
 import com.lmm.pojo.MyFriends;
 import com.lmm.pojo.Users;
@@ -13,7 +15,10 @@ import com.lmm.pojo.vo.MyFriendsVO;
 import com.lmm.service.UserService;
 import com.lmm.utils.FastDFSClient;
 import com.lmm.utils.FileUtils;
+import com.lmm.utils.JsonUtils;
 import com.lmm.utils.QRCodeUtils;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +48,8 @@ public class UserServiceImpl implements UserService {
     private FriendsRequestMapper friendsRequestMapper;
     @Autowired
     private UsersMapperCustom usersMapperCustom;
+    @Autowired
+    private ChatMsgMapper chatMsgMapper;
 
     @Override
     public boolean queryUsernameIsExist(String username) {
@@ -190,6 +197,18 @@ public class UserServiceImpl implements UserService {
         mfriend.andEqualTo("acceptUserId", acceptUserId);
 
         friendsRequestMapper.deleteByExample(friend);
+
+
+        Channel sendChannel = UserChannelRel.get(sendUserId);
+        if (sendChannel != null) {
+            //使用websocket主动推送消息到请求发起者，更新他的通讯录列表为最新
+            DataContent dataContent = new DataContent();
+            dataContent.setAction(MsgActionEnum.PULL_FRIEND.type);
+
+            sendChannel.writeAndFlush(
+                    new TextWebSocketFrame(JsonUtils.objectToJson(dataContent)));
+        }
+
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -220,5 +239,41 @@ public class UserServiceImpl implements UserService {
     public List<MyFriendsVO> queryMyFriends(String userId) {
 
         return usersMapperCustom.queryMyFriends(userId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public String saveMsg(ChatMsg chatMsg) {
+        com.lmm.pojo.ChatMsg msgDB = new com.lmm.pojo.ChatMsg();
+        String msgId = sid.nextShort();
+        msgDB.setId(msgId);
+        msgDB.setAcceptUserId(chatMsg.getReceiverId());
+        msgDB.setSendUserId(chatMsg.getSenderId());
+        msgDB.setCreateTime(new Date());
+        msgDB.setSignFlag(MsgSignFlagEnum.unsign.type);
+        msgDB.setMsg(chatMsg.getMsg());
+
+        chatMsgMapper.insert(msgDB);
+        return msgId;
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public void updateMsgSigned(List<String> msgIdList) {
+        usersMapperCustom.batchUpdateMsgSinged(msgIdList);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public List<com.lmm.pojo.ChatMsg> getUnReadMsgList(String acceptUserId) {
+
+        Example chat = new Example(com.lmm.pojo.ChatMsg.class);
+        Example.Criteria chatCriteria = chat.createCriteria();
+        chatCriteria.andEqualTo("acceptUserId", acceptUserId);
+        chatCriteria.andEqualTo("signFlag", MsgSignFlagEnum.unsign.type);
+
+        List<com.lmm.pojo.ChatMsg> result = chatMsgMapper.selectByExample(chat);
+
+        return result;
     }
 }

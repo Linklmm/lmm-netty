@@ -65,4 +65,16 @@ public class UsersVO {
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    @Override
+    public String toString() {
+        return "UsersVO{" +
+                "id='" + id + '\'' +
+                ", username='" + username + '\'' +
+                ", faceImage='" + faceImage + '\'' +
+                ", faceImageBig='" + faceImageBig + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", qrcode='" + qrcode + '\'' +
+                '}';
+    }
 }

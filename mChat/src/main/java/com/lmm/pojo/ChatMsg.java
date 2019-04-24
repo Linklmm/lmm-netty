@@ -106,6 +106,18 @@ public class ChatMsg {
         return createTime;
     }
 
+    @Override
+    public String toString() {
+        return "ChatMsg{" +
+                "id='" + id + '\'' +
+                ", sendUserId='" + sendUserId + '\'' +
+                ", acceptUserId='" + acceptUserId + '\'' +
+                ", msg='" + msg + '\'' +
+                ", signFlag=" + signFlag +
+                ", createTime=" + createTime +
+                '}';
+    }
+
     /**
      * @param createTime
      */

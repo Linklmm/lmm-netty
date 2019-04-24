@@ -79,4 +79,14 @@ public class FriendsRequest {
     public void setRequestDateTime(Date requestDateTime) {
         this.requestDateTime = requestDateTime;
     }
+
+    @Override
+    public String toString() {
+        return "FriendsRequest{" +
+                "id='" + id + '\'' +
+                ", sendUserId='" + sendUserId + '\'' +
+                ", acceptUserId='" + acceptUserId + '\'' +
+                ", requestDateTime=" + requestDateTime +
+                '}';
+    }
 }

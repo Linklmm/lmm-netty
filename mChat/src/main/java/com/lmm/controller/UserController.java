@@ -5,6 +5,7 @@ package com.lmm.controller;
 
 import com.lmm.enums.OperatorFriendRequestTypeEnum;
 import com.lmm.enums.SearchFriendsStatusEnum;
+import com.lmm.pojo.ChatMsg;
 import com.lmm.pojo.Users;
 import com.lmm.pojo.bo.UsersBO;
 import com.lmm.pojo.vo.MyFriendsVO;
@@ -260,15 +261,16 @@ public class UserController {
 
     /**
      * 查询用户好友列表
+     *
      * @param userId
      * @return
      */
     @PostMapping("/myFriends")
     public IMoocJSONResult myFriends(String userId) {
         //判断userId不能为空
-        LOGGER.info("查询用户好友列表的入参userId:{}",userId);
-        if (StringUtils.isBlank(userId)){
-            LOGGER.error("用户ID不能为空！ userId:{}",userId);
+        LOGGER.info("查询用户好友列表的入参userId:{}", userId);
+        if (StringUtils.isBlank(userId)) {
+            LOGGER.error("用户ID不能为空！ userId:{}", userId);
             return IMoocJSONResult.errorMsg("用户id不能为空！");
         }
 
@@ -277,5 +279,26 @@ public class UserController {
         List<MyFriendsVO> myFriends = userService.queryMyFriends(userId);
 
         return IMoocJSONResult.ok(myFriends);
+    }
+
+    /**
+     * 获取用户未签收的消息列表（未读）
+     *
+     * @param acceptUserId
+     * @return
+     */
+    @PostMapping("/getUnReadMsgList")
+    public IMoocJSONResult getUnReadMsgList(String acceptUserId) {
+        if (StringUtils.isBlank(acceptUserId)) {
+            LOGGER.error("获取用户未签收的消息列表：用户id不能为空acceptUserId:{}", acceptUserId);
+            return IMoocJSONResult.errorMsg("");
+        }
+
+        //查询列表
+        List<ChatMsg> unReadMsgList = userService.getUnReadMsgList(acceptUserId);
+
+        //
+        LOGGER.info("获取用户未签收的消息列表（未读）的出参unReadMsgList:{}",unReadMsgList);
+        return IMoocJSONResult.ok(unReadMsgList);
     }
 }

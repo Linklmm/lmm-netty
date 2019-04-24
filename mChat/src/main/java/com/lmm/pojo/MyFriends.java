@@ -54,4 +54,13 @@ public class MyFriends {
     public void setMyFriendUserId(String myFriendUserId) {
         this.myFriendUserId = myFriendUserId;
     }
+
+    @Override
+    public String toString() {
+        return "MyFriends{" +
+                "id='" + id + '\'' +
+                ", myUserId='" + myUserId + '\'' +
+                ", myFriendUserId='" + myFriendUserId + '\'' +
+                '}';
+    }
 }

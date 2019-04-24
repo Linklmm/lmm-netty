@@ -31,4 +31,13 @@ public class UsersBO {
     public void setFaceData(String faceData) {
         this.faceData = faceData;
     }
+
+    @Override
+    public String toString() {
+        return "UsersBO{" +
+                "userId='" + userId + '\'' +
+                ", faceData='" + faceData + '\'' +
+                ", nickname='" + nickname + '\'' +
+                '}';
+    }
 }

@@ -1,5 +1,6 @@
 package com.lmm.service;
 
+import com.lmm.netty.ChatMsg;
 import com.lmm.pojo.Users;
 import com.lmm.pojo.vo.FriendRequestVO;
 import com.lmm.pojo.vo.MyFriendsVO;
@@ -92,4 +93,24 @@ public interface UserService {
      * @return
      */
     public List<MyFriendsVO> queryMyFriends(String userId);
+
+    /**
+     * 保存聊天消息到数据库
+     * @param chatMsg
+     * @return
+     */
+    public String saveMsg(ChatMsg chatMsg);
+
+    /**
+     * 批量签收消息
+     * @param msgIdList
+     */
+    public void updateMsgSigned(List<String> msgIdList);
+
+    /**
+     * 获取未签收消息列表
+     * @param acceptUserId
+     * @return
+     */
+    public List<com.lmm.pojo.ChatMsg> getUnReadMsgList(String acceptUserId);
 }

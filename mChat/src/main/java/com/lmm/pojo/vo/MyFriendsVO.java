@@ -4,6 +4,16 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 
 public class MyFriendsVO {
+    @Override
+    public String toString() {
+        return "MyFriendsVO{" +
+                "friendId='" + friendId + '\'' +
+                ", friendUsername='" + friendUsername + '\'' +
+                ", friendFaceImage='" + friendFaceImage + '\'' +
+                ", friendNickname='" + friendNickname + '\'' +
+                '}';
+    }
+
     @Id
     private String friendId;
 
